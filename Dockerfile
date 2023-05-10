@@ -29,7 +29,7 @@ RUN R -e "install.packages(c('shiny', 'rmarkdown'), repos='https://cloud.r-proje
 Run R -e "install.packages(c('seqinr', 'shinydashboard', 'tidyverse', 'plotly', 'shinyWidgets', 'shinyjs', 'googleVis', 'xtable'), repos = 'https://cloud.r-project.org/')"
 RUN R -e "install.packages(c('DT', 'htmltools', 'phangorn', 'bios2mds', 'zip', 'ape', 'zCompositions', 'compositions', 'stringr'), repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages(c('rpart', 'rpart.plot', 'caret', 'ggplot2', 'randomForest', 'data.table', 'xgboost', 'SHAPforxgboost', 'fontawesome', 'grid', 'ggplotify'), repos='https://cloud.r-project.org/')"
-Run R -e "install.packages(c('BiocManager', 'devtools', 'remotes'), repos='https://cloud.r-project.org/')"
+Run R -e "install.packages(c('BiocManager', 'remotes'), repos='https://cloud.r-project.org/')"
 
 RUN R -e "BiocManager::install('phyloseq')"
 
@@ -37,7 +37,6 @@ RUN R -e "remotes::install_github('joey711/biomformat')"
 RUN R -e "remotes::install_github('nik01010/dashboardthemes', force = TRUE)"
 RUN R -e "remotes::install_github('jcrodriguez1989/chatgpt')"
 RUN R -e "remotes::install_github('zmjones/edarf', subdir = 'pkg')"
-# RUN R -e "devtools::install_github('zmjones/edarf', subdir = 'pkg')"
 
 RUN mkdir /root/app
 COPY app /root/app
