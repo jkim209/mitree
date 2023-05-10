@@ -18,6 +18,10 @@ RUN apt-get update && apt-get install -y \
     r-base-dev \
     pkg-config \
     cmake \
+    libtiff5-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libgdal-dev \
     && rm -rf /var/lib/apt/lists/*
     
 RUN apt-get update && apt-get install -y \
