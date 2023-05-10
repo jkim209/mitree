@@ -2,7 +2,6 @@ library(shiny)
 library(BiocManager)
 library(seqinr)
 library(shinydashboard)
-library(tidyverse)
 library(plotly)
 library(shinyWidgets)
 library(shinyjs)
@@ -33,6 +32,7 @@ library(biomformat)
 library(dashboardthemes)
 library(edarf)
 library(chatgpt)
+library(tidyverse)
 
 # COMMENTS ------
 {
