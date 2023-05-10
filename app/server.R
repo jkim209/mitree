@@ -97,7 +97,6 @@ server = function(input, output, session){
   options(shiny.maxRequestSize=30*1024^2)
   source("MiDataProc.Data.Upload.R")
   source("MiDataProc.Data.Input.R")
-  source("MiDataProc.Theme.R")
   source("MiDataProc.ML.Models.R")
   source("MiDataProc.ML.DT.R")
   source("MiDataProc.ML.RF.R")
