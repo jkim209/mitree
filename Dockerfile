@@ -33,11 +33,11 @@ Run R -e "install.packages(c('BiocManager', 'devtools', 'remotes'), repos='https
 
 RUN R -e "BiocManager::install('phyloseq')"
 
-RUN R -e "devtools::install_github('joey711/biomformat')"
-RUN R -e "devtools::install_github('zmjones/edarf', subdir = 'pkg')"
+RUN R -e "remotes::install_github('joey711/biomformat')"
 RUN R -e "remotes::install_github('nik01010/dashboardthemes', force = TRUE)"
 RUN R -e "remotes::install_github('jcrodriguez1989/chatgpt')"
- 
+RUN R -e "devtools::install_github('zmjones/edarf', subdir = 'pkg')"
+
 RUN mkdir /root/app
 COPY app /root/app
 COPY Rprofile.site /usr/lib/R/etc/
