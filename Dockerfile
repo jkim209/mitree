@@ -59,7 +59,6 @@ COPY app/MiDataProc.ML.DT.R /root/app
 COPY app/MiDataProc.ML.Models.R /root/app
 COPY app/MiDataProc.ML.RF.R /root/app
 COPY app/MiDataProc.ML.XGB.R /root/app
-COPY app/MiDataProc.Theme.R /root/app
 
 EXPOSE 3838
 
