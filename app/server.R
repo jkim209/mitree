@@ -2767,9 +2767,9 @@ server = function(input, output, session){
       detail = "This may take a while...", value = 0, {
         incProgress(0.5, message = "Asking Chat GPT")
         
-        taxa.name <- input$reg_rf_rename_taxa
-        var.name <- input$reg_rf_response_var_rename
-        api.key <- input$reg_rf_chatgpt_key
+        taxa.name <- input$rf_reg_rename_taxa
+        var.name <- input$rf_reg_response_var_rename
+        api.key <- input$rf_reg_chatgpt_key
         
         chat_result <- tryCatch(chat_gpt_MiTree(taxa.name, var.name, api.key), error = function(e){
           message("Invalid or incorrect API key. Please check it again.")
@@ -2778,14 +2778,13 @@ server = function(input, output, session){
         })
         
         if(!is.null(chat_result)){
-          output$reg_rf_chatgpt_vis <-renderUI({
+          output$rf_reg_chatgpt_vis <-renderUI({
             tagList(br(), strong(paste("Tell me about the roles of a", taxa.name, "on a", var.name)), br(), p(chat_result))
           })
         }
       }
     )
   })
-  
   
   ## (4-1) XGB - Classification -------------------
   observeEvent(input$xgb_cla_runButton, {
