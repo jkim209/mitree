@@ -46,7 +46,7 @@ library(chatgpt)
   HOME_COMMENT2 = p(strong("URLs:"), "Web server (online implementation):", tags$a(href = "http://mitree.micloud.kr", "http://mitree.micloud.kr"), 
                     "; GitHub repository (local implementation):", 
                     tags$a(href = "https://github.com/jkim209/MiTreeGit", "https://github.com/jkim209/MiTreeGit"), style = "font-size:13pt")
-  HOME_COMMENT3 = p(strong("Maintainers:"), "Ji Hun Kim (", tags$a(href = "jihun.kim.3@stonybrook.edu", "jihun.kim.3@stonybrook.edu"), ")", style = "font-size:13pt")
+  HOME_COMMENT3 = p(strong("Maintainers:"), "Jihun Kim (", tags$a(href = "jihun.kim.3@stonybrook.edu", "jihun.kim.3@stonybrook.edu"), ")", style = "font-size:13pt")
   HOME_COMMENT4 = p(strong("Reference:"), "Kim J, Koh H. MiTree: A unified web cloud analytic platform for user-friendly and interpretable microbiome data mining using tree-based methods (in review)", style = "font-size:13pt")
   
   INPUT_PHYLOSEQ_COMMENT1 = p("Description:", br(), br(), "This should be an '.Rdata' or '.rds' file, and the data should be in 'phyloseq' format (see ", 
