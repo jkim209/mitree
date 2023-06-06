@@ -103,21 +103,22 @@ server = function(input, output, session){
   source("MiDataProc.ML.RF.R")
   source("MiDataProc.ML.XGB.R")
   
-  env <- new.env()
-  nm <- load(file = "Data/sub_1_con_biom.Rdata", env)[1]
-  sub_1_con_biom <- env[[nm]]
+  # env <- new.env()
+  # nm <- load(file = "Data/sub_1_con_biom.Rdata", env)[1]
+  # sub_1_con_biom <- env[[nm]]
+  sub_1_con_biom <- readRDS(file = "Data/sub_1_con_biom.rds")
   
-  # otu.tab <- otu_table(sub_1_con_biom)
-  # tax.tab <- tax_table(sub_1_con_biom)
-  # sam.dat <- sample_data(sub_1_con_biom)
+  # otu_tab <- otu_table(sub_1_con_biom)
+  # tax_tab <- tax_table(sub_1_con_biom)
+  # sam_dat <- sample_data(sub_1_con_biom)
   
-  otu.tab <- read.table("Data/sub_1_con_biom_otu_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
-  tax.tab <- read.table("Data/sub_1_con_biom_tax_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
-  sam.dat <- read.table("Data/sub_1_con_biom_sam_dat.txt", header = TRUE, check.names = FALSE, sep = "\t")
+  otu_tab <- read.table("Data/sub_1_con_biom_otu_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
+  tax_tab <- read.table("Data/sub_1_con_biom_tax_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
+  sam_dat <- read.table("Data/sub_1_con_biom_sam_dat.txt", header = TRUE, check.names = FALSE, sep = "\t")
   
   output$downloadData_sub_1_con <- downloadHandler(
     filename = function() {
-      paste("sub_1_con_biom.Rdata", sep = "")
+      paste("sub_1_con_biom.rds", sep = "")
     },
     content = function(file1) {
       save(sub_1_con_biom, file = file1)
@@ -129,10 +130,10 @@ server = function(input, output, session){
     content <- function(fname) {
       temp <- setwd(tempdir())
       on.exit(setwd(temp))
-      dataFiles = c("otu.tab.txt", "tax.tab.txt", "sam.dat.txt")
-      write.table(otu.tab, "otu.tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
-      write.table(tax.tab, "tax.tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
-      write.table(sam.dat, "sam.dat.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      dataFiles = c("otu_tab.txt", "tax_tab.txt", "sam_dat.txt")
+      write.table(otu_tab, "otu_tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      write.table(tax_tab, "tax_tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      write.table(sam_dat, "sam_dat.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
       zip(zipfile=fname, files=dataFiles)
     })
   
@@ -252,38 +253,35 @@ server = function(input, output, session){
         
         req(phyloseq.data)
         if (ext == "Rdata") {
-          print(255)
           phyloseq.dataPath = phyloseq.data$datapath
-          print(257)
           e = new.env()
           name <- load(phyloseq.dataPath, envir = e)
-          print(260)
           data <- e[[name]]
-          print(262)
+          
           if (sum(sapply(sample_data(data),is.factor))!=0) {
             sample_data(data)[,which(sapply(sample_data(data), is.factor))] = lapply(sample_data(data)[,which(sapply(sample_data(data), is.factor))], as.character)
           }
-          print(266)
+          
           colnames(tax_table(data)) = c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
-          print(268)
+          
           if (sum(colnames(otu_table(data)) %in% rownames(sample_data(data))) < sum(rownames(otu_table(data)) %in% rownames(sample_data(data)))) {
             otu_table(data) = t(otu_table(data))
           }
-          print(272)
+          
           return(data)
         } else if (ext == "rds") {
           phyloseq.dataPath = phyloseq.data$datapath
           data <- readRDS(phyloseq.dataPath)
-          print(277)
+          
           if (sum(sapply(sample_data(data),is.factor))!=0) {
             sample_data(data)[,which(sapply(sample_data(data), is.factor))] = lapply(sample_data(data)[,which(sapply(sample_data(data), is.factor))], as.character)
           }
           colnames(tax_table(data)) = c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
-          print(279)
+          
           if (sum(colnames(otu_table(data)) %in% rownames(sample_data(data))) < sum(rownames(otu_table(data)) %in% rownames(sample_data(data)))) {
             otu_table(data) = t(otu_table(data))
           }
-          print(283)
+          
           return(data)
         } else {
           shinyjs::toggle(id = "phyloseqUpload_error", anim = TRUE, time = 1, animType = "fade")
