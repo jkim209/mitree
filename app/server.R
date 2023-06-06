@@ -110,7 +110,9 @@ server = function(input, output, session){
   otu_tab <- otu_table(sub_1_con_biom)
   tax_tab <- tax_table(sub_1_con_biom)
   sam_dat <- sample_data(sub_1_con_biom)
-  
+  print(dim(otu_tab))
+  print(dim(tax_tab))
+  print(dim(sam_dat))
   output$downloadData_sub_1_con <- downloadHandler(
     filename = function() {
       paste("sub_1_con_biom.Rdata", sep = "")
@@ -127,11 +129,8 @@ server = function(input, output, session){
       on.exit(setwd(temp))
       dataFiles = c("otu_tab.txt", "tax_tab.txt", "sam_dat.txt")
       write.table(otu_tab, "otu_tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
-      print("OTU worked")
       write.table(tax_tab, "tax_tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
-      print("Taxa tab worked")
       write.table(sam_dat, "sam_dat.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
-      print("Sample tab worked")
       zip(zipfile=fname, files=dataFiles)
     })
   
