@@ -111,14 +111,14 @@ server = function(input, output, session){
   sub_1_con_biom_tax_tab <- tax_table(sub_1_con_biom)
   sub_1_con_biom_sam_dat <- sample_data(sub_1_con_biom)
   
-  output$downloadData.sub.1.con <- downloadHandler(
+  output$downloadData_sub_1_con <- downloadHandler(
     filename = function() {
       paste("sub_1_con_biom.Rdata", sep = "")
     },
     content = function(file1) {
       save(sub_1_con_biom, file = file1)
     })
-  output$downloadZip.sub.1.con.biom <- downloadHandler(
+  output$downloadZip_sub_1_con_biom <- downloadHandler(
     filename = function() {
       paste("sub_1_con_biom",".zip", sep = "")
     },
@@ -174,7 +174,7 @@ server = function(input, output, session){
         output$addDownloadinfo <- renderUI({
           tagList(
             box(title = strong("Example Data", style = "color:white"), width = NULL, status = "info", solidHeader = TRUE,
-                downloadButton("downloadData.sub.1.con", "Oral Microbiome", width = '30%', style = "color:black; background-color: red2"),
+                downloadButton("downloadData_sub_1_con", "Oral Microbiome", width = '30%', style = "color:black; background-color: red2"),
                 br(),br(),
                 INPUT_PHYLOSEQ_COMMENT2,
                 p("", style = "margin-bottom:-8px")
@@ -212,7 +212,7 @@ server = function(input, output, session){
         output$addDownloadinfo <- renderUI({
           tagList(
             box(title = strong("Example Data", style = "color:white"), width = NULL, status = "info", solidHeader = TRUE,
-                downloadButton("downloadZip.sub.1.con.biom", "Oral Microbiome", width = '30%', style = "color:black; background-color: red2"),
+                downloadButton("downloadZip_sub_1_con_biom", "Oral Microbiome", width = '30%', style = "color:black; background-color: red2"),
                 br(),br(),
                 INPUT_INDIVIDUAL_DATA_COMMENT2,
                 p("", style = "margin-bottom:-8px")
