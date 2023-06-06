@@ -249,38 +249,38 @@ server = function(input, output, session){
       dataInfile  = reactive({
         phyloseq.data = input$phyloseqData
         ext <- tools::file_ext(phyloseq.data$datapath)
-        
+        print(252)
         req(phyloseq.data)
         if (ext == "Rdata") {
           phyloseq.dataPath = phyloseq.data$datapath
           e = new.env()
           name <- load(phyloseq.dataPath, envir = e)
           data <- e[[name]]
-          
+          print(259)
           if (sum(sapply(sample_data(data),is.factor))!=0) {
             sample_data(data)[,which(sapply(sample_data(data), is.factor))] = lapply(sample_data(data)[,which(sapply(sample_data(data), is.factor))], as.character)
           }
-          
+          print(263)
           colnames(tax_table(data)) = c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
-          
+          print(265)
           if (sum(colnames(otu_table(data)) %in% rownames(sample_data(data))) < sum(rownames(otu_table(data)) %in% rownames(sample_data(data)))) {
             otu_table(data) = t(otu_table(data))
           }
-          
+          print(269)
           return(data)
         } else if (ext == "rds") {
           phyloseq.dataPath = phyloseq.data$datapath
           data <- readRDS(phyloseq.dataPath)
-          
+          print(274)
           if (sum(sapply(sample_data(data),is.factor))!=0) {
             sample_data(data)[,which(sapply(sample_data(data), is.factor))] = lapply(sample_data(data)[,which(sapply(sample_data(data), is.factor))], as.character)
           }
           colnames(tax_table(data)) = c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
-          
+          print(279)
           if (sum(colnames(otu_table(data)) %in% rownames(sample_data(data))) < sum(rownames(otu_table(data)) %in% rownames(sample_data(data)))) {
             otu_table(data) = t(otu_table(data))
           }
-          
+          print(283)
           return(data)
         } else {
           shinyjs::toggle(id = "phyloseqUpload_error", anim = TRUE, time = 1, animType = "fade")
