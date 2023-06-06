@@ -87,9 +87,9 @@ options(scipen=999)
                                     MiTree will analyze only the matched features and units.", style = "font-size:11pt")
   INPUT_INDIVIDUAL_DATA_COMMENT2 = p("You can download example microbiome data 'Oral.zip'. This zip file contains three necessary data components, feature table (otu.tab.txt), taxonomic table (tax.tab.txt), and metadata/sample information (sam.dat.txt).", br(), br(),
                                      "> setwd('/yourdatadirectory/')", br(), br(), 
-                                     "> otu.tab <- read.table(file = 'sub_1_con_biom_otu_tab.txt', check.names = FALSE)", br(), 
-                                     "> tax.tab <- read.table(file = 'sub_1_con_biom_tax_tab.txt', check.names = FALSE)", br(), 
-                                     "> sam.dat <- read.table(file = 'sub_1_con_biom_sam_dat.txt', check.names = FALSE)", br(), br(),
+                                     "> otu.tab <- read.table(file = 'otu_tab.txt', check.names = FALSE)", br(), 
+                                     "> tax.tab <- read.table(file = 'tax_tab.txt', check.names = FALSE)", br(), 
+                                     "> sam.dat <- read.table(file = 'sam_dat.txt', check.names = FALSE)", br(), br(),
                                      "You can check if the features are matched and identical across feature table and taxonomic table, 
                                      and the units are matched and identical between feature table and metadata/sample information using following code.", br(), br(), 
                                      " > identical(rownames(otu.tab), rownames(tax.tab))", br(), 

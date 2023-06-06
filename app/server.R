@@ -42,9 +42,9 @@
                                     MiTree will analyze only the matched features and units.", style = "font-size:11pt")
   INPUT_INDIVIDUAL_DATA_COMMENT2 = p("You can download example microbiome data 'Oral.zip'. This zip file contains three necessary data components, feature table (otu.tab.txt), taxonomic table (tax.tab.txt), and metadata/sample information (sam.dat.txt).", br(), br(),
                                      "> setwd('/yourdatadirectory/')", br(), br(), 
-                                     "> otu.tab <- read.table(file = 'sub_1_con_biom_otu_tab.txt', check.names = FALSE)", br(), 
-                                     "> tax.tab <- read.table(file = 'sub_1_con_biom_tax_tab.txt', check.names = FALSE)", br(), 
-                                     "> sam.dat <- read.table(file = 'sub_1_con_biom_sam_dat.txt', check.names = FALSE)", br(), br(),
+                                     "> otu.tab <- read.table(file = 'otu.tab.txt', check.names = FALSE)", br(), 
+                                     "> tax.tab <- read.table(file = 'tax.tab.txt', check.names = FALSE)", br(), 
+                                     "> sam.dat <- read.table(file = 'sam.dat.txt', check.names = FALSE)", br(), br(),
                                      "You can check if the features are matched and identical across feature table and taxonomic table, 
                                      and the units are matched and identical between feature table and metadata/sample information using following code.", br(), br(), 
                                      " > identical(rownames(otu.tab), rownames(tax.tab))", br(), 
@@ -107,9 +107,9 @@ server = function(input, output, session){
   nm <- load(file = "Data/sub_1_con_biom.Rdata", env)[1]
   sub_1_con_biom <- env[[nm]]
   
-  sub_1_con_biom_otu_tab <- otu_table(sub_1_con_biom)
-  sub_1_con_biom_tax_tab <- tax_table(sub_1_con_biom)
-  sub_1_con_biom_sam_dat <- sample_data(sub_1_con_biom)
+  otu_tab <- otu_table(sub_1_con_biom)
+  tax_tab <- tax_table(sub_1_con_biom)
+  sam_dat <- sample_data(sub_1_con_biom)
   
   output$downloadData_sub_1_con <- downloadHandler(
     filename = function() {
@@ -125,10 +125,10 @@ server = function(input, output, session){
     content <- function(fname) {
       temp <- setwd(tempdir())
       on.exit(setwd(temp))
-      dataFiles = c("sub_1_con_biom_otu_tab.txt", "sub_1_con_biom_tax_tab.txt", "sub_1_con_biom_sam_dat.txt")
-      write.table(sub_1_con_biom_otu_tab, "sub_1_con_biom_otu_tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
-      write.table(sub_1_con_biom_tax_tab, "sub_1_con_biom_tax_tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
-      write.table(sub_1_con_biom_sam_dat, "sub_1_con_biom_sam_dat.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      dataFiles = c("otu_tab.txt", "tax_tab.txt", "sam_dat.txt")
+      write.table(otu_tab, "otu_tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      write.table(tax_tab, "tax_tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      write.table(sam_dat, "sam_dat.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
       zip(zipfile=fname, files=dataFiles)
     })
   
