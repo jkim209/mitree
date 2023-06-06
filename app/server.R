@@ -121,7 +121,7 @@ server = function(input, output, session){
       paste("sub_1_con_biom.rds", sep = "")
     },
     content = function(file1) {
-      save(sub_1_con_biom, file = file1)
+      saveRDS(sub_1_con_biom, file = file1)
     })
   output$downloadZip_sub_1_con_biom <- downloadHandler(
     filename = function() {
