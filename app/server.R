@@ -107,13 +107,13 @@ server = function(input, output, session){
   nm <- load(file = "Data/sub_1_con_biom.Rdata", env)[1]
   sub_1_con_biom <- env[[nm]]
   
-  otu.tab <- otu_table(sub_1_con_biom)
-  tax.tab <- tax_table(sub_1_con_biom)
-  sam.dat <- sample_data(sub_1_con_biom)
+  # otu.tab <- otu_table(sub_1_con_biom)
+  # tax.tab <- tax_table(sub_1_con_biom)
+  # sam.dat <- sample_data(sub_1_con_biom)
   
-  # otu.tab <- read.table("Data/sub_1_con_biom_otu_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
-  # tax.tab <- read.table("Data/sub_1_con_biom_tax_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
-  # sam.dat <- read.table("Data/sub_1_con_biom_sam_dat.txt", header = TRUE, check.names = FALSE, sep = "\t")
+  otu.tab <- read.table("Data/sub_1_con_biom_otu_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
+  tax.tab <- read.table("Data/sub_1_con_biom_tax_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
+  sam.dat <- read.table("Data/sub_1_con_biom_sam_dat.txt", header = TRUE, check.names = FALSE, sep = "\t")
   
   output$downloadData_sub_1_con <- downloadHandler(
     filename = function() {
