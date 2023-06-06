@@ -107,12 +107,10 @@ server = function(input, output, session){
   nm <- load(file = "Data/sub_1_con_biom.Rdata", env)[1]
   sub_1_con_biom <- env[[nm]]
   
-  otu_tab <- otu_table(sub_1_con_biom)
-  tax_tab <- tax_table(sub_1_con_biom)
-  sam_dat <- phyloseq::sample_data(sub_1_con_biom)
-  print(dim(otu_tab))
-  print(dim(tax_tab))
-  print(dim(sam_dat))
+  otu.tab <- otu_table(sub_1_con_biom)
+  tax.tab <- tax_table(sub_1_con_biom)
+  sam.dat <- phyloseq::sample_data(sub_1_con_biom)
+  
   output$downloadData_sub_1_con <- downloadHandler(
     filename = function() {
       paste("sub_1_con_biom.Rdata", sep = "")
@@ -127,10 +125,10 @@ server = function(input, output, session){
     content <- function(fname) {
       temp <- setwd(tempdir())
       on.exit(setwd(temp))
-      dataFiles = c("otu_tab.txt", "tax_tab.txt", "sam_dat.txt")
-      write.table(otu_tab, "otu_tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
-      write.table(tax_tab, "tax_tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
-      write.table(sam_dat, "sam_dat.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      dataFiles = c("otu.tab.txt", "tax.tab.txt", "sam.dat.txt")
+      write.table(otu.tab, "otu.tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      write.table(tax.tab, "tax.tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      write.table(sam.dat, "sam.dat.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
       zip(zipfile=fname, files=dataFiles)
     })
   
