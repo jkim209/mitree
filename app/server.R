@@ -10,7 +10,7 @@
   HOME_COMMENT2 = p(strong("URLs:"), "Web server (online implementation):", tags$a(href = "http://mitree.micloud.kr", "http://mitree.micloud.kr"), 
                     "; GitHub repository (local implementation):", 
                     tags$a(href = "https://github.com/jkim209/MiTreeGit", "https://github.com/jkim209/MiTreeGit"), style = "font-size:13pt")
-  HOME_COMMENT3 = p(strong("Maintainers:"), "Ji Hun Kim (", tags$a(href = "jihun.kim.3@stonybrook.edu", "jihun.kim.3@stonybrook.edu"), ")", style = "font-size:13pt")
+  HOME_COMMENT3 = p(strong("Maintainers:"), "Jihun Kim (", tags$a(href = "jihun.kim.3@stonybrook.edu", "jihun.kim.3@stonybrook.edu"), ")", style = "font-size:13pt")
   HOME_COMMENT4 = p(strong("Reference:"), "Kim J, Koh H. MiTree: A unified web cloud analytic platform for user-friendly and interpretable microbiome data mining using tree-based methods (in review)", style = "font-size:13pt")
   
   INPUT_PHYLOSEQ_COMMENT1 = p("Description:", br(), br(), "This should be an '.Rdata' or '.rds' file, and the data should be in 'phyloseq' format (see ", 
@@ -22,14 +22,14 @@
                               strong("Metadata/Sample information:"),"It should contain variables for the units about host phenotypes, medical interventions, disease status or environmental/behavioral factors, where rows are units and columns are variables (row names are unit IDs, and column names are variable names).", br(), br(),
                               "* The features should be matched and identical across feature table and taxonomic table. The units should be matched and identical between feature table and metadata/sample information.
                               MiTree will analyze only the matched features and units.", style = "font-size:11pt")
-  INPUT_PHYLOSEQ_COMMENT2 = p("You can download example microbiome data 'sub.1.con.biom.Rdata' in 'phyloseq' format. For more details about 'phyloseq', see ", 
+  INPUT_PHYLOSEQ_COMMENT2 = p("You can download example microbiome data 'sub_1_con_biom.Rdata' in 'phyloseq' format. For more details about 'phyloseq', see ", 
                               htmltools::a(tags$u("https://bioconductor.org/packages/release/bioc/html/phyloseq.html"), style = "color:red3"), br(), br(), 
                               "> setwd('/yourdatadirectory/')", br(), br(), 
-                              "> load(file = 'sub.1.con.biom.Rdata')", br(), br(), 
+                              "> load(file = 'sub_1_con_biom.Rdata')", br(), br(), 
                               "> library(phyloseq)", br(), br(), 
-                              " > otu.tab <- otu_table(sub.1.con.biom)", br(), 
-                              " > tax.tab <- tax_table(sub.1.con.biom)", br(), 
-                              " > sam.dat <- sample_data(sub.1.con.biom)", br(), br(), 
+                              " > otu.tab <- otu_table(sub_1_con_biom)", br(), 
+                              " > tax.tab <- tax_table(sub_1_con_biom)", br(), 
+                              " > sam.dat <- sample_data(sub_1_con_biom)", br(), br(), 
                               "You can check if the features are matched and identical across feature table and taxonomic table, and the units are matched and identical between feature table and metadata/sample information using following code.", br(), br(), 
                               " > identical(rownames(otu.tab), rownames(tax.tab))", br(), 
                               " > identical(colnames(otu.tab), rownames(sam.dat))", style = "font-size:11pt", br(), br(),
@@ -42,9 +42,9 @@
                                     MiTree will analyze only the matched features and units.", style = "font-size:11pt")
   INPUT_INDIVIDUAL_DATA_COMMENT2 = p("You can download example microbiome data 'Oral.zip'. This zip file contains three necessary data components, feature table (otu.tab.txt), taxonomic table (tax.tab.txt), and metadata/sample information (sam.dat.txt).", br(), br(),
                                      "> setwd('/yourdatadirectory/')", br(), br(), 
-                                     "> otu.tab <- read.table(file = 'sub.1.con.biom.otu.tab.txt', check.names = FALSE)", br(), 
-                                     "> tax.tab <- read.table(file = 'sub.1.con.biom.tax.tab.txt', check.names = FALSE)", br(), 
-                                     "> sam.dat <- read.table(file = 'sub.1.con.biom.sam.dat.txt', check.names = FALSE)", br(), br(),
+                                     "> otu.tab <- read.table(file = 'sub_1_con_biom_otu_tab.txt', check.names = FALSE)", br(), 
+                                     "> tax.tab <- read.table(file = 'sub_1_con_biom_tax_tab.txt', check.names = FALSE)", br(), 
+                                     "> sam.dat <- read.table(file = 'sub_1_con_biom_sam_dat.txt', check.names = FALSE)", br(), br(),
                                      "You can check if the features are matched and identical across feature table and taxonomic table, 
                                      and the units are matched and identical between feature table and metadata/sample information using following code.", br(), br(), 
                                      " > identical(rownames(otu.tab), rownames(tax.tab))", br(), 
@@ -63,7 +63,7 @@
   QC_TAXA_NAME_COMMENT2 = p("Remove taxonomic names in the taxonomic table that are partially matched with the specified character strings (i.e., taxonomic names that contain 
                             the specified character strings). Multiple character strings should be separated by a comma. Default is \"uncultured\", \"incertae\", \"Incertae\",
                             \"unidentified\", \"unclassified\", \"unknown\".",style = "font-size:11pt")
-
+  
   DATA_TRANSFORM_COMMENT = p("Transform the data into four different formats (1) CLR (centered log ratio) (Aitchison, 1982), (2) Count (Rarefied) (Sanders, 1968), (3) Proportion, (4) Arcsine-root 
                              for each taxonomic rank (phylum, class, order, familiy, genus, species).")
   DATA_TRANSFORM_REFERENCE = p("1. Aitchison J. The statistical analysis of compositional data. J R Stat Soc B. 1982;44(2):139-77", br(),
@@ -95,39 +95,33 @@
 # SERVER -----------------------------------------------------------------------
 server = function(input, output, session){
   options(shiny.maxRequestSize=30*1024^2)
-  source("MiDataProc.Data.Upload.R")
-  source("MiDataProc.Data.Input.R")
-  source("MiDataProc.ML.Models.R")
-  source("MiDataProc.ML.DT.R")
-  source("MiDataProc.ML.RF.R")
-  source("MiDataProc.ML.XGB.R")
   
   env <- new.env()
-  nm <- load(file = "Data/sub.1.con.biom.Rdata", env)[1]
-  sub.1.con.biom <- env[[nm]]
+  nm <- load(file = "Data/sub_1_con_biom.Rdata", env)[1]
+  sub_1_con_biom <- env[[nm]]
   
-  sub.1.con.biom.otu.tab <- otu_table(sub.1.con.biom)
-  sub.1.con.biom.tax.tab <- tax_table(sub.1.con.biom)
-  sub.1.con.biom.sam.dat <- sample_data(sub.1.con.biom)
+  sub_1_con_biom_otu_tab <- otu_table(sub_1_con_biom)
+  sub_1_con_biom_tax_tab <- tax_table(sub_1_con_biom)
+  sub_1_con_biom_sam_dat <- sample_data(sub_1_con_biom)
   
   output$downloadData.sub.1.con <- downloadHandler(
     filename = function() {
-      paste("sub.1.con.biom.Rdata", sep = "")
+      paste("sub_1_con_biom.Rdata", sep = "")
     },
     content = function(file1) {
-      save(sub.1.con.biom, file = file1)
+      save(sub_1_con_biom, file = file1)
     })
   output$downloadZip.sub.1.con.biom <- downloadHandler(
     filename = function() {
-      paste("sub.1.con.biom",".zip", sep = "")
+      paste("sub_1_con_biom",".zip", sep = "")
     },
     content <- function(fname) {
       temp <- setwd(tempdir())
       on.exit(setwd(temp))
-      dataFiles = c("sub.1.con.biom.otu.tab.txt", "sub.1.con.biom.tax.tab.txt", "sub.1.con.biom.sam.dat.txt")
-      write.table(sub.1.con.biom.otu.tab, "sub.1.con.biom.otu.tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
-      write.table(sub.1.con.biom.tax.tab, "sub.1.con.biom.tax.tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
-      write.table(sub.1.con.biom.sam.dat, "sub.1.con.biom.sam.dat.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      dataFiles = c("sub_1_con_biom_otu_tab.txt", "sub_1_con_biom_tax_tab.txt", "sub_1_con_biom_sam_dat.txt")
+      write.table(sub_1_con_biom_otu_tab, "sub_1_con_biom_otu_tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      write.table(sub_1_con_biom_tax_tab, "sub_1_con_biom_tax_tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      write.table(sub_1_con_biom_sam_dat, "sub_1_con_biom_sam_dat.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
       zip(zipfile=fname, files=dataFiles)
     })
   
@@ -610,8 +604,8 @@ server = function(input, output, session){
   })
   
   observe({
-      toggleState("dt_cla_runButton", (input$dt_cla_covariate_yn == "None") | ((input$dt_cla_covariate_yn == "Covariate(s)") & (length(input$dt_cla_covariate_options) != 0)) | ((input$dt_cla_minsplit > 0) & (input$dt_cla_minbucket > 0)))
-    })
+    toggleState("dt_cla_runButton", (input$dt_cla_covariate_yn == "None") | ((input$dt_cla_covariate_yn == "Covariate(s)") & (length(input$dt_cla_covariate_options) != 0)) | ((input$dt_cla_minsplit > 0) & (input$dt_cla_minbucket > 0)))
+  })
   
   ## (2-2) DT - Regression ---------------------------
   output$dt_reg_data_input <- renderUI({
@@ -727,7 +721,7 @@ server = function(input, output, session){
                          c("Gini impurity (Default)"), selected = "Gini impurity (Default)", icon = icon("check"), width = '70%'),
       prettyRadioButtons("rf_cla_cov_loss", label = h4(strong("Loss function", style = "color:black")), animation = "jelly",
                          c("Mean squared error (Default)"), selected = "Mean squared error (Default)", icon = icon("check"), width = '70%'),
-
+      
       p(" ", style = "margin-top: 25px;"),
       h4(strong("# folds", style = "color:black")),
       p("The number of non-overlapping folds of the data to be used in cross-validations.", style = "font-size:10pt"),
@@ -896,7 +890,7 @@ server = function(input, output, session){
         to boost the tree sufficiently, but it can be at the cost of heavy computation. (Default: 5,000)", style = "font-size:10pt"),
       p(" ", style = "margin-bottom: +15px;"),
       selectInput("xgb_cla_nrounds", label = NULL, c("Choose one" = "", c(3000, 5000, 10000)), selected = 5000, width = '70%'),
-
+      
       p(" ", style = "margin-top: 25px;"),
       h4(strong("Learning rate", style = "color:black")),
       p("The rate of a newly fitted tree to be reflected into the aggregation (update). A low learning rate (e.g., 0.001) is recommended to elaborate the boosting process through slow learning, but it is at the cost of heavy computations. (Default: 0.005)", style = "font-size:10pt"),
@@ -905,13 +899,13 @@ server = function(input, output, session){
       
       prettyRadioButtons("xgb_cla_penalty", label = h4(strong("Regularization", style = "color:black")), animation = "jelly",
                          c("Yes (Default)", "No"), selected = "Yes (Default)", icon = icon("check"), width = "70%"),
-
+      
       p(" ", style = "margin-top: 25px;"),
       h4(strong("# taxa to be displayed", style = "color:black")),
       p("The maximum number of taxa per taxonomic rank to be displayed in plots.", style = "font-size:10pt"),
       p(" ", style = "margin-bottom: +15px;"),
       sliderInput("xgb_cla_var_num", label = NULL, min = 5, max = 20, value = 20, step = 5),
-
+      
       prettyRadioButtons("xgb_cla_include_species", label = h4(strong("Taxonomic ranks", style = "color:black")), animation = "jelly",
                          c("Phylum - Genus (Default)", "Phylum - Species"), selected = "Phylum - Genus (Default)",
                          icon = icon("check"), width = '80%'),
@@ -997,7 +991,7 @@ server = function(input, output, session){
             to elaborate the boosting process through slow learning, but it is at the cost of heavy computations. (Default: 0.005)", style = "font-size:10pt"),
       p(" ", style = "margin-bottom: +15px;"),
       selectInput("xgb_reg_eta", label = NULL, c("Choose one" = "", c(0.001, 0.005, 0.01, 0.05)), selected = 0.005, width = '70%'),
-
+      
       prettyRadioButtons("xgb_reg_penalty", label = h4(strong("Regularization", style = "color:black")), animation = "jelly",
                          c("Yes (Default)", "No"), selected = "Yes (Default)", icon = icon("check"), width = "70%"),
       
@@ -1634,7 +1628,7 @@ server = function(input, output, session){
             )
           })
         })
-       
+        
         dt_cla_imp_var_list <- list()
         for(name in level.names){
           dt_cla_imp_var_list[[name]] <- dt.used.var.names(dt.list, name, colnames.list.cla)
@@ -1829,14 +1823,14 @@ server = function(input, output, session){
           incProgress(1/10, message = sprintf("Decision Tree: %s in Progress", str_to_title(name)))
           set.seed(578)
           fit[[name]] <- try(dt.reg(data = data,
-                                            sam.dat.na = sam.dat.na,
-                                            y.name = y.name,
-                                            minsplit = as.numeric(input$dt_reg_minsplit),
-                                            minbucket = as.numeric(input$dt_reg_minbucket),
-                                            nfold = nfold,
-                                            name = name,
-                                            p = 1),
-                                     silent = TRUE)
+                                    sam.dat.na = sam.dat.na,
+                                    y.name = y.name,
+                                    minsplit = as.numeric(input$dt_reg_minsplit),
+                                    minbucket = as.numeric(input$dt_reg_minbucket),
+                                    nfold = nfold,
+                                    name = name,
+                                    p = 1),
+                             silent = TRUE)
         }
         
         dt.summary.table.list <- list()
@@ -2089,7 +2083,7 @@ server = function(input, output, session){
         if(!is.null(chat_result)){
           output$dt_reg_chatgpt_vis <-renderUI({
             tagList(br(), strong(paste("Tell me about the roles of a", taxa.name, "on a", var.name)), br(), p(chat_result))
-            })
+          })
         }
         
       }

@@ -34,6 +34,15 @@ library(dashboardthemes)
 library(edarf)
 library(chatgpt)
 
+source("Source/MiDataProc.Data.Upload.R")
+source("Source/MiDataProc.Data.Input.R")
+source("Source/MiDataProc.ML.Models.R")
+source("Source/MiDataProc.ML.DT.R")
+source("Source/MiDataProc.ML.RF.R")
+source("Source/MiDataProc.ML.XGB.R")
+
+options(scipen=999)
+
 # COMMENTS ------
 {
   TITLE = p("MiTree: A Unified Web Cloud Analytic Platform for User-Friendly and Interpretable Microbiome Data Mining Using Tree-Based Methods", style = "font-size:18pt")
@@ -58,14 +67,14 @@ library(chatgpt)
                               strong("Metadata/Sample information:"),"It should contain variables for the units about host phenotypes, medical interventions, disease status or environmental/behavioral factors, where rows are units and columns are variables (row names are unit IDs, and column names are variable names).", br(), br(),
                               "* The features should be matched and identical across feature table and taxonomic table. The units should be matched and identical between feature table and metadata/sample information.
                               MiTree will analyze only the matched features and units.", style = "font-size:11pt")
-  INPUT_PHYLOSEQ_COMMENT2 = p("You can download example microbiome data 'sub.1.con.biom.Rdata' in 'phyloseq' format. For more details about 'phyloseq', see ", 
+  INPUT_PHYLOSEQ_COMMENT2 = p("You can download example microbiome data 'sub_1_con_biom.Rdata' in 'phyloseq' format. For more details about 'phyloseq', see ", 
                               htmltools::a(tags$u("https://bioconductor.org/packages/release/bioc/html/phyloseq.html"), style = "color:red3"), br(), br(), 
                               "> setwd('/yourdatadirectory/')", br(), br(), 
-                              "> load(file = 'sub.1.con.biom.Rdata')", br(), br(), 
+                              "> load(file = 'sub_1_con_biom.Rdata')", br(), br(), 
                               "> library(phyloseq)", br(), br(), 
-                              " > otu.tab <- otu_table(sub.1.con.biom)", br(), 
-                              " > tax.tab <- tax_table(sub.1.con.biom)", br(), 
-                              " > sam.dat <- sample_data(sub.1.con.biom)", br(), br(), 
+                              " > otu.tab <- otu_table(sub_1_con_biom)", br(), 
+                              " > tax.tab <- tax_table(sub_1_con_biom)", br(), 
+                              " > sam.dat <- sample_data(sub_1_con_biom)", br(), br(), 
                               "You can check if the features are matched and identical across feature table and taxonomic table, and the units are matched and identical between feature table and metadata/sample information using following code.", br(), br(), 
                               " > identical(rownames(otu.tab), rownames(tax.tab))", br(), 
                               " > identical(colnames(otu.tab), rownames(sam.dat))", style = "font-size:11pt", br(), br(),
@@ -78,9 +87,9 @@ library(chatgpt)
                                     MiTree will analyze only the matched features and units.", style = "font-size:11pt")
   INPUT_INDIVIDUAL_DATA_COMMENT2 = p("You can download example microbiome data 'Oral.zip'. This zip file contains three necessary data components, feature table (otu.tab.txt), taxonomic table (tax.tab.txt), and metadata/sample information (sam.dat.txt).", br(), br(),
                                      "> setwd('/yourdatadirectory/')", br(), br(), 
-                                     "> otu.tab <- read.table(file = 'sub.1.con.biom.otu.tab.txt', check.names = FALSE)", br(), 
-                                     "> tax.tab <- read.table(file = 'sub.1.con.biom.tax.tab.txt', check.names = FALSE)", br(), 
-                                     "> sam.dat <- read.table(file = 'sub.1.con.biom.sam.dat.txt', check.names = FALSE)", br(), br(),
+                                     "> otu.tab <- read.table(file = 'sub_1_con_biom_otu_tab.txt', check.names = FALSE)", br(), 
+                                     "> tax.tab <- read.table(file = 'sub_1_con_biom_tax_tab.txt', check.names = FALSE)", br(), 
+                                     "> sam.dat <- read.table(file = 'sub_1_con_biom_sam_dat.txt', check.names = FALSE)", br(), br(),
                                      "You can check if the features are matched and identical across feature table and taxonomic table, 
                                      and the units are matched and identical between feature table and metadata/sample information using following code.", br(), br(), 
                                      " > identical(rownames(otu.tab), rownames(tax.tab))", br(), 
@@ -99,7 +108,7 @@ library(chatgpt)
   QC_TAXA_NAME_COMMENT2 = p("Remove taxonomic names in the taxonomic table that are partially matched with the specified character strings (i.e., taxonomic names that contain 
                             the specified character strings). Multiple character strings should be separated by a comma. Default is \"uncultured\", \"incertae\", \"Incertae\",
                             \"unidentified\", \"unclassified\", \"unknown\".",style = "font-size:11pt")
-
+  
   DATA_TRANSFORM_COMMENT = p("Transform the data into four different formats (1) CLR (centered log ratio) (Aitchison, 1982), (2) Count (Rarefied) (Sanders, 1968), (3) Proportion, (4) Arcsine-root 
                              for each taxonomic rank (phylum, class, order, familiy, genus, species).")
   DATA_TRANSFORM_REFERENCE = p("1. Aitchison J. The statistical analysis of compositional data. J R Stat Soc B. 1982;44(2):139-77", br(),
@@ -279,64 +288,64 @@ library(chatgpt)
         
         ## QC ----
         tabItem(tabName = "step2", br(),
-          sidebarLayout(
-            position = "left",
-            sidebarPanel(width = 3,
-                         textInput("kingdom", h4(strong("Kingdom")), value = "Bacteria"),
-                         QC_KINGDOM_COMMENT,
-                         tags$style(type = 'text/css', '#slider1 .irs-grid-text {font-size: 1px}'),
-                         tags$style(type = 'text/css', '#slider2 .irs-grid-text {font-size: 1px}'),
-                         
-                         sliderInput("slider1", h4(strong("Library size")), min=0, max=10000, value = 3000, step = 1000),
-                         QC_LIBRARY_SIZE_COMMENT1,
-                         QC_LIBRARY_SIZE_COMMENT2,
-                         
-                         sliderInput("slider2", h4(strong("Mean proportion")), min = 0, max = 0.1, value = 0.002, step = 0.001,  post  = " %"),
-                         QC_MEAN_PROP_COMMENT1,
-                         QC_MEAN_PROP_COMMENT2,
-                         
-                         br(),
-                         p(" ", style = "margin-bottom: -20px;"),
-                         
-                         h4(strong("Erroneous taxonomic names")),
-                         textInput("rem.str", label = "Complete match", value = ""),
-                         QC_TAXA_NAME_COMMENT1,
-                         
-                         textInput("part.rem.str", label = "Partial match", value = ""),
-                         QC_TAXA_NAME_COMMENT2,
-                         
-                         actionButton("run", (strong("Run!")), class = "btn-info"), 
-                         p(" ", style = "margin-bottom: +10px;"), 
-                         p(strong("Attention:"),"You have to click this Run button to perform data transformation and further analyses.", style = "margin-bottom:-10px"), br(),
-                         uiOutput("moreControls")),
-            mainPanel(width = 9,
-                      fluidRow(width = 12,
-                               status = "info", solidHeader = TRUE, 
-                               valueBoxOutput("sample_Size", width = 3),
-                               valueBoxOutput("OTUs_Size", width = 3),
-                               valueBoxOutput("phyla", width = 3),
-                               valueBoxOutput("classes", width = 3)),
-                      fluidRow(width = 12, 
-                               status = "info", solidHeader = TRUE,
-                               valueBoxOutput("orders", width = 3),
-                               valueBoxOutput("families", width = 3),
-                               valueBoxOutput("genera", width = 3),
-                               valueBoxOutput("species", width = 3)),
-                      fluidRow(style = "position:relative",
-                               tabBox(width = 6, title = strong("Library Size", style = "color:black"), 
-                                      tabPanel("Histogram",
-                                               plotlyOutput("hist"),
-                                               sliderInput("binwidth", "# of Bins:",min = 0, max = 100, value = 50, width = "100%"),
-                                               chooseSliderSkin("Round", color = "#112446")),
-                                      tabPanel("Box Plot", 
-                                               plotlyOutput("boxplot"))),
-                               tabBox(width = 6, title = strong("Mean Proportion", style = "color:black"), 
-                                      tabPanel("Histogram",
-                                               plotlyOutput("hist2"),
-                                               sliderInput("binwidth2", "# of Bins:",min = 0, max = 100, value = 50, width = "100%"),
-                                               chooseSliderSkin("Round", color = "#112446")),
-                                      tabPanel("Box Plot",
-                                               plotlyOutput("boxplot2"))))))),
+                sidebarLayout(
+                  position = "left",
+                  sidebarPanel(width = 3,
+                               textInput("kingdom", h4(strong("Kingdom")), value = "Bacteria"),
+                               QC_KINGDOM_COMMENT,
+                               tags$style(type = 'text/css', '#slider1 .irs-grid-text {font-size: 1px}'),
+                               tags$style(type = 'text/css', '#slider2 .irs-grid-text {font-size: 1px}'),
+                               
+                               sliderInput("slider1", h4(strong("Library size")), min=0, max=10000, value = 3000, step = 1000),
+                               QC_LIBRARY_SIZE_COMMENT1,
+                               QC_LIBRARY_SIZE_COMMENT2,
+                               
+                               sliderInput("slider2", h4(strong("Mean proportion")), min = 0, max = 0.1, value = 0.002, step = 0.001,  post  = " %"),
+                               QC_MEAN_PROP_COMMENT1,
+                               QC_MEAN_PROP_COMMENT2,
+                               
+                               br(),
+                               p(" ", style = "margin-bottom: -20px;"),
+                               
+                               h4(strong("Erroneous taxonomic names")),
+                               textInput("rem.str", label = "Complete match", value = ""),
+                               QC_TAXA_NAME_COMMENT1,
+                               
+                               textInput("part.rem.str", label = "Partial match", value = ""),
+                               QC_TAXA_NAME_COMMENT2,
+                               
+                               actionButton("run", (strong("Run!")), class = "btn-info"), 
+                               p(" ", style = "margin-bottom: +10px;"), 
+                               p(strong("Attention:"),"You have to click this Run button to perform data transformation and further analyses.", style = "margin-bottom:-10px"), br(),
+                               uiOutput("moreControls")),
+                  mainPanel(width = 9,
+                            fluidRow(width = 12,
+                                     status = "info", solidHeader = TRUE, 
+                                     valueBoxOutput("sample_Size", width = 3),
+                                     valueBoxOutput("OTUs_Size", width = 3),
+                                     valueBoxOutput("phyla", width = 3),
+                                     valueBoxOutput("classes", width = 3)),
+                            fluidRow(width = 12, 
+                                     status = "info", solidHeader = TRUE,
+                                     valueBoxOutput("orders", width = 3),
+                                     valueBoxOutput("families", width = 3),
+                                     valueBoxOutput("genera", width = 3),
+                                     valueBoxOutput("species", width = 3)),
+                            fluidRow(style = "position:relative",
+                                     tabBox(width = 6, title = strong("Library Size", style = "color:black"), 
+                                            tabPanel("Histogram",
+                                                     plotlyOutput("hist"),
+                                                     sliderInput("binwidth", "# of Bins:",min = 0, max = 100, value = 50, width = "100%"),
+                                                     chooseSliderSkin("Round", color = "#112446")),
+                                            tabPanel("Box Plot", 
+                                                     plotlyOutput("boxplot"))),
+                                     tabBox(width = 6, title = strong("Mean Proportion", style = "color:black"), 
+                                            tabPanel("Histogram",
+                                                     plotlyOutput("hist2"),
+                                                     sliderInput("binwidth2", "# of Bins:",min = 0, max = 100, value = 50, width = "100%"),
+                                                     chooseSliderSkin("Round", color = "#112446")),
+                                            tabPanel("Box Plot",
+                                                     plotlyOutput("boxplot2"))))))),
         
         ## Data Transformation -----
         tabItem(tabName = "dataTransform", br(),
