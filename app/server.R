@@ -103,14 +103,13 @@ server = function(input, output, session){
   source("MiDataProc.ML.RF.R")
   source("MiDataProc.ML.XGB.R")
   
-  # env <- new.env()
-  # nm <- load(file = "Data/sub_1_con_biom.Rdata", env)[1]
-  # sub_1_con_biom <- env[[nm]]
-  load(file = "Data/sub_1_con_biom.Rdata")
+  env <- new.env()
+  nm <- load(file = "Data/sub_1_con_biom.Rdata", env)[1]
+  sub_1_con_biom <- env[[nm]]
   
   otu_tab <- otu_table(sub_1_con_biom)
   tax_tab <- tax_table(sub_1_con_biom)
-  sam_dat <- sample_data(sub_1_con_biom)
+  sam_dat <- phyloseq::sample_data(sub_1_con_biom)
   print(dim(otu_tab))
   print(dim(tax_tab))
   print(dim(sam_dat))
