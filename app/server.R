@@ -249,29 +249,32 @@ server = function(input, output, session){
       dataInfile  = reactive({
         phyloseq.data = input$phyloseqData
         ext <- tools::file_ext(phyloseq.data$datapath)
-        print(252)
+        
         req(phyloseq.data)
         if (ext == "Rdata") {
+          print(255)
           phyloseq.dataPath = phyloseq.data$datapath
+          print(257)
           e = new.env()
           name <- load(phyloseq.dataPath, envir = e)
+          print(260)
           data <- e[[name]]
-          print(259)
+          print(262)
           if (sum(sapply(sample_data(data),is.factor))!=0) {
             sample_data(data)[,which(sapply(sample_data(data), is.factor))] = lapply(sample_data(data)[,which(sapply(sample_data(data), is.factor))], as.character)
           }
-          print(263)
+          print(266)
           colnames(tax_table(data)) = c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
-          print(265)
+          print(268)
           if (sum(colnames(otu_table(data)) %in% rownames(sample_data(data))) < sum(rownames(otu_table(data)) %in% rownames(sample_data(data)))) {
             otu_table(data) = t(otu_table(data))
           }
-          print(269)
+          print(272)
           return(data)
         } else if (ext == "rds") {
           phyloseq.dataPath = phyloseq.data$datapath
           data <- readRDS(phyloseq.dataPath)
-          print(274)
+          print(277)
           if (sum(sapply(sample_data(data),is.factor))!=0) {
             sample_data(data)[,which(sapply(sample_data(data), is.factor))] = lapply(sample_data(data)[,which(sapply(sample_data(data), is.factor))], as.character)
           }
