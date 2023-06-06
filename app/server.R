@@ -96,6 +96,13 @@
 server = function(input, output, session){
   options(shiny.maxRequestSize=30*1024^2)
   
+  source("MiDataProc.Data.Upload.R")
+  source("MiDataProc.Data.Input.R")
+  source("MiDataProc.ML.Models.R")
+  source("MiDataProc.ML.DT.R")
+  source("MiDataProc.ML.RF.R")
+  source("MiDataProc.ML.XGB.R")
+  
   env <- new.env()
   nm <- load(file = "Data/sub_1_con_biom.Rdata", env)[1]
   sub_1_con_biom <- env[[nm]]

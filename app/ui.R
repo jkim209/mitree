@@ -34,12 +34,12 @@ library(dashboardthemes)
 library(edarf)
 library(chatgpt)
 
-source("Source/MiDataProc.Data.Upload.R")
-source("Source/MiDataProc.Data.Input.R")
-source("Source/MiDataProc.ML.Models.R")
-source("Source/MiDataProc.ML.DT.R")
-source("Source/MiDataProc.ML.RF.R")
-source("Source/MiDataProc.ML.XGB.R")
+source("MiDataProc.Data.Upload.R")
+source("MiDataProc.Data.Input.R")
+source("MiDataProc.ML.Models.R")
+source("MiDataProc.ML.DT.R")
+source("MiDataProc.ML.RF.R")
+source("MiDataProc.ML.XGB.R")
 
 options(scipen=999)
 
