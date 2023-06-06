@@ -106,7 +106,8 @@ server = function(input, output, session){
   # env <- new.env()
   # nm <- load(file = "Data/sub_1_con_biom.Rdata", env)[1]
   # sub_1_con_biom <- env[[nm]]
-  sub_1_con_biom <- readRDS(file = "Data/sub_1_con_biom.rds")
+  biom <- readRDS(file = "Data/sub_1_con_biom.rds")
+  sub_1_con_biom <- biom
   
   # otu_tab <- otu_table(sub_1_con_biom)
   # tax_tab <- tax_table(sub_1_con_biom)
