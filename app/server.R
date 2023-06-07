@@ -131,7 +131,7 @@ server = function(input, output, session){
     content <- function(fname) {
       temp <- setwd(tempdir())
       on.exit(setwd(temp))
-      dataFiles = c("otu_tab.txt", "tax_tab.txt", "sam_dat.txt")
+      dataFiles = c("otu.tab.txt", "tax.tab.txt", "sam.dat.txt")
       write.table(otu.tab, "otu.tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
       write.table(tax.tab, "tax.tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
       write.table(sam.dat, "sam.dat.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
