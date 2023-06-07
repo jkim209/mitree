@@ -104,39 +104,37 @@ server = function(input, output, session){
   source("MiDataProc.ML.XGB.R")
   
   env <- new.env()
-  # nm <- load(file = "Data/sub_1_con_biom.Rdata", env)[1]
-  nm <- load(file = "Data/biom.MZ.BMI.Rdata", env)[1]
-  BMI <- env[[nm]]
+  nm <- load(file = "Data/sub_1_con_biom.Rdata", env)[1]
+  # nm <- load(file = "Data/biom.MZ.BMI.Rdata", env)[1]
+  sub_1_con_biom <- env[[nm]]
   # sub_1_con_biom <- readRDS(file = "Data/sub_1_con_biom.rds")
   
-  otu.tab <- otu_table(BMI)
-  tax.tab <- tax_table(BMI)
-  sam.dat <- sample_data(BMI)
-  tree <- phy_tree(BMI)
+  # otu.tab <- otu_table(BMI)
+  # tax.tab <- tax_table(BMI)
+  # sam.dat <- sample_data(BMI)
   
-  # otu_tab <- read.table("Data/sub_1_con_biom_otu_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
-  # tax_tab <- read.table("Data/sub_1_con_biom_tax_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
-  # sam_dat <- read.table("Data/sub_1_con_biom_sam_dat.txt", header = TRUE, check.names = FALSE, sep = "\t")
+  otu.tab <- read.table("Data/sub_1_con_biom_otu_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
+  tax.tab <- read.table("Data/sub_1_con_biom_tax_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
+  sam.dat <- read.table("Data/sub_1_con_biom_sam_dat.txt", header = TRUE, check.names = FALSE, sep = "\t")
   
   output$downloadData <- downloadHandler(
     filename = function() {
-      paste("biom.MZ.BMI", ".Rdata", sep = "")
+      paste("sub_1_con_biom", ".Rdata", sep = "")
     },
     content = function(file1) {
-      save(BMI, file = file1)
+      save(sub_1_con_biom, file = file1)
     })
   output$downloadZip <- downloadHandler(
     filename = function() {
-      paste("BMI",".zip", sep = "")
+      paste("sub_1_con_biom",".zip", sep = "")
     },
     content <- function(fname) {
       temp <- setwd(tempdir())
       on.exit(setwd(temp))
-      dataFiles = c("otu_tab.txt", "tax_tab.txt", "sam_dat.txt", "tree.tre")
+      dataFiles = c("otu_tab.txt", "tax_tab.txt", "sam_dat.txt")
       write.table(otu.tab, "otu.tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
       write.table(tax.tab, "tax.tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
       write.table(sam.dat, "sam.dat.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
-      write.tree(tree, "tree.tre")
       zip(zipfile=fname, files=dataFiles)
     })
   
