@@ -46,6 +46,7 @@ RUN mkdir /root/app
 COPY app /root/app
 COPY Rprofile.site /usr/lib/R/etc/
 
+COPY app/Data/biom.MZ.BMI.Rdata /root/app
 COPY app/Data/sub_1_con_biom.rds /root/app
 COPY app/Data/sub_1_con_biom_otu_tab.txt /root/app
 COPY app/Data/sub_1_con_biom_sam_dat.txt /root/app
