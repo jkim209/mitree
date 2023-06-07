@@ -103,38 +103,40 @@ server = function(input, output, session){
   source("MiDataProc.ML.RF.R")
   source("MiDataProc.ML.XGB.R")
   
-  # env <- new.env()
+  env <- new.env()
   # nm <- load(file = "Data/sub_1_con_biom.Rdata", env)[1]
-  # sub_1_con_biom <- env[[nm]]
-  biom <- readRDS(file = "Data/sub_1_con_biom.rds")
-  sub_1_con_biom <- biom
+  nm <- load(file = "Data/biom.MZ.BMI.Rdata", env)[1]
+  BMI <- env[[nm]]
+  # sub_1_con_biom <- readRDS(file = "Data/sub_1_con_biom.rds")
   
-  # otu_tab <- otu_table(sub_1_con_biom)
-  # tax_tab <- tax_table(sub_1_con_biom)
-  # sam_dat <- sample_data(sub_1_con_biom)
+  otu.tab <- otu_table(BMI)
+  tax.tab <- tax_table(BMI)
+  sam.dat <- sample_data(BMI)
+  tree <- phy_tree(BMI)
   
-  otu_tab <- read.table("Data/sub_1_con_biom_otu_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
-  tax_tab <- read.table("Data/sub_1_con_biom_tax_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
-  sam_dat <- read.table("Data/sub_1_con_biom_sam_dat.txt", header = TRUE, check.names = FALSE, sep = "\t")
+  # otu_tab <- read.table("Data/sub_1_con_biom_otu_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
+  # tax_tab <- read.table("Data/sub_1_con_biom_tax_tab.txt", header = TRUE, check.names = FALSE, sep = "\t")
+  # sam_dat <- read.table("Data/sub_1_con_biom_sam_dat.txt", header = TRUE, check.names = FALSE, sep = "\t")
   
-  output$downloadData_sub_1_con <- downloadHandler(
+  output$downloadData <- downloadHandler(
     filename = function() {
-      paste("sub_1_con_biom.rds", sep = "")
+      paste("biom.MZ.BMI", ".Rdata", sep = "")
     },
     content = function(file1) {
-      saveRDS(sub_1_con_biom, file = file1)
+      save(BMI, file = file1)
     })
-  output$downloadZip_sub_1_con_biom <- downloadHandler(
+  output$downloadZip <- downloadHandler(
     filename = function() {
-      paste("sub_1_con_biom",".zip", sep = "")
+      paste("BMI",".zip", sep = "")
     },
     content <- function(fname) {
       temp <- setwd(tempdir())
       on.exit(setwd(temp))
-      dataFiles = c("otu_tab.txt", "tax_tab.txt", "sam_dat.txt")
-      write.table(otu_tab, "otu_tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
-      write.table(tax_tab, "tax_tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
-      write.table(sam_dat, "sam_dat.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      dataFiles = c("otu_tab.txt", "tax_tab.txt", "sam_dat.txt", "tree.tre")
+      write.table(otu.tab, "otu.tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      write.table(tax.tab, "tax.tab.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      write.table(sam.dat, "sam.dat.txt", row.names = TRUE, col.names = TRUE, sep = "\t")
+      write.tree(tree, "tree.tre")
       zip(zipfile=fname, files=dataFiles)
     })
   
@@ -180,7 +182,7 @@ server = function(input, output, session){
         output$addDownloadinfo <- renderUI({
           tagList(
             box(title = strong("Example Data", style = "color:white"), width = NULL, status = "info", solidHeader = TRUE,
-                downloadButton("downloadData_sub_1_con", "Oral Microbiome", width = '30%', style = "color:black; background-color: red2"),
+                downloadButton("downloadData", "Oral Microbiome", width = '30%', style = "color:black; background-color: red2"),
                 br(),br(),
                 INPUT_PHYLOSEQ_COMMENT2,
                 p("", style = "margin-bottom:-8px")
@@ -218,7 +220,7 @@ server = function(input, output, session){
         output$addDownloadinfo <- renderUI({
           tagList(
             box(title = strong("Example Data", style = "color:white"), width = NULL, status = "info", solidHeader = TRUE,
-                downloadButton("downloadZip_sub_1_con_biom", "Oral Microbiome", width = '30%', style = "color:black; background-color: red2"),
+                downloadButton("downloadZip", "Oral Microbiome", width = '30%', style = "color:black; background-color: red2"),
                 br(),br(),
                 INPUT_INDIVIDUAL_DATA_COMMENT2,
                 p("", style = "margin-bottom:-8px")
