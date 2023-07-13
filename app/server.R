@@ -1434,6 +1434,7 @@ server = function(input, output, session){
           sam.dat.na <- try(input.data[[2]], silent = TRUE)
           
           y.name <- input$dt_cla_response
+          sam.dat.na <- check.column.class(sam.dat.na)
           sam.dat.na <- try(cov.logistic.reg(sam.dat.na, y.name), silent = TRUE)
           y.name <- "resid"
           nfold <- ifelse(input$dt_cla_nfold == "LOOCV (Default)", lib.size.func(infile$qc_biom)$num.sams, as.numeric(input$dt_cla_nfold))
@@ -1819,7 +1820,7 @@ server = function(input, output, session){
           data <- try(input.data[[1]], silent = TRUE)
           sam.dat.na <- try(input.data[[2]], silent = TRUE)
           y.name <- input$dt_reg_response
-          
+          sam.dat.na <- check.column.class(sam.dat.na)
           sam.dat.na <- try(cov.linear.reg(sam.dat.na, y.name), silent = TRUE)
           y.name <- "resid"
         }
@@ -2176,6 +2177,7 @@ server = function(input, output, session){
           nfold <- as.numeric(input$rf_cla_nfold)
           ntree <- as.numeric(input$rf_cla_ntree)
           
+          sam.dat.na <- check.column.class(sam.dat.na)
           sam.dat.na <- try(cov.logistic.reg(sam.dat.na, y.name), silent = TRUE)
           y.name <- "resid"
           
@@ -2530,8 +2532,9 @@ server = function(input, output, session){
           input.data <- try(cov.remove.na(data = data, sam.dat = chooseData$sam.dat, y.name = input$rf_reg_response, cov.name = input$rf_reg_covariate_options, level.names = level.names), silent = TRUE)
           data <- try(input.data[[1]], silent = TRUE)
           sam.dat.na <- try(input.data[[2]], silent = TRUE)
-          y.name <- input$rf_reg_response
           
+          y.name <- input$rf_reg_response
+          sam.dat.na <- check.column.class(sam.dat.na)
           sam.dat.na <- try(cov.linear.reg(sam.dat.na, y.name), silent = TRUE)
           y.name <- "resid"
         }
@@ -2878,6 +2881,7 @@ server = function(input, output, session){
           nfold <- as.numeric(input$xgb_cla_nfold)
           nrounds <- as.numeric(input$xgb_cla_nrounds)
           
+          sam.dat.na <- check.column.class(sam.dat.na)
           sam.dat.na <- try(cov.logistic.reg(sam.dat.na, y.name), silent = TRUE)
           y.name <- "resid"
           
@@ -3231,8 +3235,9 @@ server = function(input, output, session){
           input.data <- try(cov.remove.na(data = data, sam.dat = chooseData$sam.dat, y.name = input$xgb_reg_response, cov.name = input$xgb_reg_covariate_options, level.names = level.names), silent = TRUE)
           data <- try(input.data[[1]], silent = TRUE)
           sam.dat.na <- try(input.data[[2]], silent = TRUE)
-          y.name <- input$xgb_reg_response
           
+          y.name <- input$xgb_reg_response
+          sam.dat.na <- check.column.class(sam.dat.na)
           sam.dat.na <- try(cov.linear.reg(sam.dat.na, y.name), silent = TRUE)
           y.name <- "resid"
         }
