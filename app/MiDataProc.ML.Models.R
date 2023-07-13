@@ -117,10 +117,10 @@ str.check <- function(sam.dat, y.name){
   if(len == 2){
     return("Binary")
   }
-  else if(len == 3 | len == 4){
+  else if(len >= 3 & len <= 8){
     return("Multinomial")
   }
-  else if(len > 4 & is.numeric(var)){
+  else if(len > 8 & is.numeric(var)){
     return("Continuous")
   }
   else {
@@ -153,7 +153,7 @@ col.str.check <- function(sam.dat, name){
 
 get.cat.levels <- function(sam.dat, y.name){
   levels <- levels(as.factor(unlist(sam.dat$gingival_index)))
-  if(length(levels) >= 2 & length(levels) <= 4){
+  if(length(levels) >= 2 & length(levels) <= 8){
     return(levels)
   }
   else{
