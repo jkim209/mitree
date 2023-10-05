@@ -33,7 +33,7 @@ RUN R -e "install.packages(c('shiny', 'rmarkdown'), repos='https://cloud.r-proje
 Run R -e "install.packages(c('seqinr', 'shinydashboard', 'tidyverse', 'plotly', 'shinyWidgets', 'shinyjs', 'googleVis', 'xtable'), repos = 'https://cloud.r-project.org/')"
 RUN R -e "install.packages(c('DT', 'htmltools', 'phangorn', 'bios2mds', 'zip', 'ape', 'zCompositions', 'compositions', 'stringr'), repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages(c('rpart', 'rpart.plot', 'caret', 'ggplot2', 'randomForest', 'data.table', 'xgboost', 'SHAPforxgboost', 'fontawesome', 'grid', 'ggplotify'), repos='https://cloud.r-project.org/')"
-Run R -e "install.packages(c('BiocManager', 'remotes'), repos='https://cloud.r-project.org/')"
+Run R -e "install.packages(c('BiocManager', 'remotes', 'reshape2', 'fossil', 'ROCR', 'picante', 'ecodist'), repos='https://cloud.r-project.org/')"
 
 RUN R -e "BiocManager::install('phyloseq')"
 
@@ -46,10 +46,10 @@ RUN mkdir /root/app
 COPY app /root/app
 COPY Rprofile.site /usr/lib/R/etc/
 
-COPY app/Data/sub_1_con_biom.Rdata /root/app
-COPY app/Data/sub_1_con_biom_otu_tab.txt /root/app
-COPY app/Data/sub_1_con_biom_sam_dat.txt /root/app
-COPY app/Data/sub_1_con_biom_tax_tab.txt /root/app
+COPY app/Data/sub.1.con.biom.Rdata /root/app
+COPY app/Data/sub.1.con.biom.otu.tab.txt /root/app
+COPY app/Data/sub.1.con.biom.sam.dat.txt /root/app
+COPY app/Data/sub.1.con.biom.tax.tab.txt /root/app
 
 COPY app/www/MiTree_Home_Img2.png /root/app
 
