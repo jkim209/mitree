@@ -96,14 +96,14 @@
 # SERVER -----------------------------------------------------------------------
 server = function(input, output, session){
   options(shiny.maxRequestSize=30*1024^2)
-
+  
   source("MiDataProc.Data.Upload.R")
   source("MiDataProc.Data.Input.R")
   source("MiDataProc.ML.Models.R")
   source("MiDataProc.ML.DT.R")
   source("MiDataProc.ML.RF.R")
   source("MiDataProc.ML.XGB.R")
-  
+
   env <- new.env()
   nm <- load(file = "Data/sub.1.con.biom.Rdata", env)[1]
   sub.1.con.biom <- env[[nm]]
@@ -616,7 +616,7 @@ server = function(input, output, session){
   })
 
   observe({
-    toggleState("dt_cla_runButton", (input$dt_cla_covariate_yn == "None") | ((input$dt_cla_covariate_yn == "Covariate(s)") & (length(input$dt_cla_covariate_options) != 0)) | ((input$dt_cla_minsplit > 0) & (input$dt_cla_minbucket > 0)))
+    toggleState("dt_cla_runButton", (input$dt_cla_covariate_yn == "None" & (input$dt_cla_response != "")) | ((input$dt_cla_covariate_yn == "Covariate(s)") & (length(input$dt_cla_covariate_options) != 0) & (input$dt_cla_response != "")))
   })
   
   ## (2-2) DT - Regression ---------------------------
@@ -653,6 +653,7 @@ server = function(input, output, session){
   observeEvent(input$dt_reg_covariate_yn,{
     if (input$dt_reg_covariate_yn == "Covariate(s)") {
       shinyjs::show("dt_reg_covariate_list")
+      print(input$dt_reg_response)
     }
     else if (input$dt_reg_covariate_yn == "None") {
       shinyjs::hide("dt_reg_covariate_list")
@@ -690,7 +691,7 @@ server = function(input, output, session){
   })
   
   observe({
-    toggleState("dt_reg_runButton", (input$dt_reg_covariate_yn == "None") | ((input$dt_reg_covariate_yn == "Covariate(s)") & (length(input$dt_reg_covariate_options) != 0)) | ((input$dt_reg_minsplit > 0) & (input$dt_reg_minbucket > 0)))
+    toggleState("dt_reg_runButton", (input$dt_reg_covariate_yn == "None" & (input$dt_reg_response != "")) | ((input$dt_reg_covariate_yn == "Covariate(s)") & (length(input$dt_reg_covariate_options) != 0) & (input$dt_reg_response != "")))
   })
   
   ## (3-1) RF - Classification ---------------------------
@@ -777,7 +778,7 @@ server = function(input, output, session){
   })
 
   observe({
-    toggleState("rf_cla_runButton", (input$rf_cla_covariate_yn == "None") | ((input$rf_cla_covariate_yn == "Covariate(s)") & (length(input$rf_cla_covariate_options) != 0)))
+    toggleState("rf_cla_runButton", (input$rf_cla_covariate_yn == "None" & (input$rf_cla_response != "")) | ((input$rf_cla_covariate_yn == "Covariate(s)") & (length(input$rf_cla_covariate_options) != 0) & (input$rf_cla_response != "")))
   })
   
   ## (3-2) RF - Regression ---------------------------
@@ -851,7 +852,7 @@ server = function(input, output, session){
   })
   
   observe({
-    toggleState("rf_reg_runButton", (input$rf_reg_covariate_yn == "None") | ((input$rf_reg_covariate_yn == "Covariate(s)") & (length(input$rf_reg_covariate_options) != 0)))
+    toggleState("rf_reg_runButton", (input$rf_reg_covariate_yn == "None" & (input$rf_reg_response != "")) | ((input$rf_reg_covariate_yn == "Covariate(s)") & (length(input$rf_reg_covariate_options) != 0) & (input$rf_reg_response != "")))
   })
   
   ## (4-1) XGB - Classification ---------------------------
@@ -948,7 +949,7 @@ server = function(input, output, session){
   })
 
   observe({
-    toggleState("xgb_cla_runButton", (input$xgb_cla_covariate_yn == "None") | ((input$xgb_cla_covariate_yn == "Covariate(s)") & (length(input$xgb_cla_covariate_options) != 0)))
+    toggleState("xgb_cla_runButton", (input$xgb_cla_covariate_yn == "None" & (input$xgb_cla_response != "")) | ((input$xgb_cla_covariate_yn == "Covariate(s)") & (length(input$xgb_cla_covariate_options) != 0) & (input$xgb_cla_response != "")))
   })
   
   ## (4-2) XGB - Regression ---------------------------
@@ -1035,7 +1036,7 @@ server = function(input, output, session){
   })
   
   observe({
-    toggleState("xgb_reg_runButton", (input$xgb_reg_covariate_yn == "None") | ((input$xgb_reg_covariate_yn == "Covariate(s)") & (length(input$xgb_reg_covariate_options) != 0)))
+    toggleState("xgb_reg_runButton", (input$xgb_reg_covariate_yn == "None" & (input$xgb_reg_response != "")) | ((input$xgb_reg_covariate_yn == "Covariate(s)") & (length(input$xgb_reg_covariate_options) != 0) & (input$xgb_reg_response != "")))
   })
   
   ## Variable Assignment --------------
@@ -1676,7 +1677,7 @@ server = function(input, output, session){
           sam.dat.na <- try(input.data[[2]], silent = TRUE)
           
           y.name <- input$dt_cla_response
-          sam.dat.na <- check.column.class(sam.dat.na)
+          sam.dat.na <- try(check.column.class(sam.dat.na), silent = TRUE)
           sam.dat.na <- try(cov.logistic.reg(sam.dat.na, y.name), silent = TRUE)
           y.name <- "resid"
           nfold <- ifelse(input$dt_cla_nfold == "LOOCV (Default)", lib.size.func(infile$qc_biom)$num.sams, as.numeric(input$dt_cla_nfold))
@@ -1742,8 +1743,7 @@ server = function(input, output, session){
                        tabsetPanel(tabPanel(title = "Tree", align = "center", br(),
                                             plotOutput(paste0("dt_cla_fancy_tree", i), height = 750, width = 850), br(),
                                             dataTableOutput(paste0("dt_cla_column_table", i), height = "auto", width = 600), br(), br(),
-                                            dataTableOutput(paste0("dt_cla_summary_table", i), height = 400, width = 900),
-                                            p(" ", style = "margin-bottom: -175px;")),
+                                            dataTableOutput(paste0("dt_cla_summary_table", i), height = 400, width = 900)),
                                    tabPanel(title = "CV Error", align = "center", br(),
                                             plotOutput(paste0("dt_cla_tuned_plot", i), height = 600, width = 500)),
                                    tabPanel(title = "Test Error", align = "left", br(),
@@ -1797,11 +1797,12 @@ server = function(input, output, session){
           
           if(cov == "Covariate(s)"){
             output[[paste0("dt_cla_test_error", j)]] <- renderUI({
+              dt_cla_mse <- try(get.mse(predict(dt.list[[level.names[j]]]$final.model, dt.list[[level.names[j]]]$test$x), dt.list[[level.names[j]]]$test$y), silent = TRUE)
+              dt_cla_mae <- try(get.mae(predict(dt.list[[level.names[j]]]$final.model, dt.list[[level.names[j]]]$test$x), dt.list[[level.names[j]]]$test$y), silent = TRUE)
               tagList(
-                p(strong("Test Results", style = "color:black; font-size:13pt")),
                 tags$ul(
-                  tags$li(p(paste("Test MSE:", try(get.mse(predict(dt.list[[level.names[j]]]$final.model, dt.list[[level.names[j]]]$test$x), dt.list[[level.names[j]]]$test$y), silent = TRUE)), style = "font-size:12pt")),
-                  tags$li(p(paste("Test MAE:", try(get.mae(predict(dt.list[[level.names[j]]]$final.model, dt.list[[level.names[j]]]$test$x), dt.list[[level.names[j]]]$test$y), silent = TRUE)), style = "font-size:12pt"))
+                  tags$li(p(paste("Test MSE:", try(format(round(dt_cla_mse, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt")),
+                  tags$li(p(paste("Test MAE:", try(format(round(dt_cla_mae, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt"))
                   , style = "font-size:12pt"),
                 p("", style = "margin-bottom: 15pt")
               )
@@ -1809,11 +1810,12 @@ server = function(input, output, session){
           }
           else{
             output[[paste0("dt_cla_test_error", j)]] <- renderUI({
+              dt_cla_err <- try(1-get.acc(predict(dt.list[[level.names[j]]]$final.model, dt.list[[level.names[j]]]$test$x), dt.list[[level.names[j]]]$test$y), silent = TRUE)
+              dt_cla_auc <- try(get.auc(predict(dt.list[[level.names[j]]]$final.model, dt.list[[level.names[j]]]$test$x, type = "prob")[,2], dt.list[[level.names[j]]]$test$y), silent = TRUE)
               tagList(
-                p(strong("Test Results", style = "color:black; font-size:13pt")),
                 tags$ul(
-                  tags$li(p(paste("Test Misclassification Error:", try(1-get.acc(predict(dt.list[[level.names[j]]]$final.model, dt.list[[level.names[j]]]$test$x), dt.list[[level.names[j]]]$test$y), silent = TRUE)), style = "font-size:12pt")),
-                  tags$li(p(paste("Test AUC:", try(get.auc(predict(dt.list[[level.names[j]]]$final.model, dt.list[[level.names[j]]]$test$x, type = "prob")[,2], dt.list[[level.names[j]]]$test$y), silent = TRUE)), style = "font-size:12pt"))
+                  tags$li(p(paste("Test Misclassification Error:", try(format(round(dt_cla_err, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt")),
+                  tags$li(p(paste("Test AUC:", try(format(round(dt_cla_auc, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt"))
                   , style = "font-size:12pt"),
                 p("", style = "margin-bottom: 15pt")
               )
@@ -1846,13 +1848,13 @@ server = function(input, output, session){
               if (length(level.names) == 5) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(dt.importance.df(dt.list, level.names[i]), file = dataFiles[i], sep = "\t")
+                  write.table(try(dt.importance.df(dt.list, level.names[i]), silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               else if(length(level.names) == 6) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt", "Species.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(dt.importance.df(dt.list, level.names[i]), file = dataFiles[i], sep = "\t")
+                  write.table(try(dt.importance.df(dt.list, level.names[i]), silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               zip(zipfile=DA.file, files=dataFiles)
@@ -1868,13 +1870,13 @@ server = function(input, output, session){
               if (length(level.names) == 5) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(dt.var.used.table.list[[level.names[j]]], file = dataFiles[i], sep = "\t")
+                  write.table(try(dt.var.used.table.list[[level.names[i]]], silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               else if(length(level.names) == 6) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt", "Species.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(dt.var.used.table.list[[level.names[j]]], file = dataFiles[i], sep = "\t")
+                  write.table(try(dt.var.used.table.list[[level.names[i]]], silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               zip(zipfile=DA.file, files=dataFiles)
@@ -1890,13 +1892,13 @@ server = function(input, output, session){
               if (length(level.names) == 5) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(dt.summary.table.list[[level.names[j]]], file = dataFiles[i], sep = "\t")
+                  write.table(try(dt.summary.table.list[[level.names[i]]], silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               else if(length(level.names) == 6) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt", "Species.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(dt.summary.table.list[[level.names[j]]], file = dataFiles[i], sep = "\t")
+                  write.table(try(dt.summary.table.list[[level.names[i]]], silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               zip(zipfile=DA.file, files=dataFiles)
@@ -1914,7 +1916,7 @@ server = function(input, output, session){
         
         dt_cla_imp_var_list <- list()
         for(name in level.names){
-          dt_cla_imp_var_list[[name]] <- dt.used.var.names(dt.list, name, colnames.list.cla)
+          dt_cla_imp_var_list[[name]] <- try(dt.used.var.names(dt.list, name, colnames.list.cla), silent = TRUE)
         }
         output$dt_cla_chatgpt_ui <- renderUI({
           tagList(
@@ -2194,11 +2196,12 @@ server = function(input, output, session){
           })
           
           output[[paste0("dt_reg_test_error", j)]] <- renderUI({
+            dt_reg_mse <- try(get.mse(predict(fit[[level.names[j]]]$final.model, fit[[level.names[j]]]$test$x), fit[[level.names[j]]]$test$y), silent = TRUE)
+            dt_reg_mae <- try(get.mae(predict(fit[[level.names[j]]]$final.model, fit[[level.names[j]]]$test$x), fit[[level.names[j]]]$test$y), silent = TRUE)
             tagList(
-              p(strong("Test Results", style = "color:black; font-size:13pt")),
               tags$ul(
-                tags$li(p(paste("Test MSE:", try(get.mse(predict(fit[[level.names[j]]]$final.model, fit[[level.names[j]]]$test$x), fit[[level.names[j]]]$test$y), silent = TRUE)), style = "font-size:12pt")),
-                tags$li(p(paste("Test MAE:", try(get.mae(predict(fit[[level.names[j]]]$final.model, fit[[level.names[j]]]$test$x), fit[[level.names[j]]]$test$y), silent = TRUE)), style = "font-size:12pt"))
+                tags$li(p(paste("Test MSE:", try(format(round(dt_reg_mse, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt")),
+                tags$li(p(paste("Test MAE:", try(format(round(dt_reg_mae, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt"))
                 , style = "font-size:12pt")
             )
           })
@@ -2229,13 +2232,13 @@ server = function(input, output, session){
               if (length(level.names) == 5) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(dt.importance.df(fit, level.names[i]), file = dataFiles[i], sep = "\t")
+                  write.table(try(dt.importance.df(fit, level.names[i]), silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               else if(length(level.names) == 6) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt", "Species.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(dt.importance.df(fit, level.names[i]), file = dataFiles[i], sep = "\t")
+                  write.table(try(dt.importance.df(fit, level.names[i]), silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               zip(zipfile=DA.file, files=dataFiles)
@@ -2251,13 +2254,13 @@ server = function(input, output, session){
               if (length(level.names) == 5) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(dt.var.used.table.list[[level.names[j]]], file = dataFiles[i], sep = "\t")
+                  write.table(try(dt.var.used.table.list[[level.names[j]]], silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               else if(length(level.names) == 6) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt", "Species.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(dt.var.used.table.list[[level.names[j]]], file = dataFiles[i], sep = "\t")
+                  write.table(try(dt.var.used.table.list[[level.names[j]]], silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               zip(zipfile=DA.file, files=dataFiles)
@@ -2273,13 +2276,13 @@ server = function(input, output, session){
               if (length(level.names) == 5) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(dt.summary.table.list[[level.names[j]]], file = dataFiles[i], sep = "\t")
+                  write.table(try(dt.summary.table.list[[level.names[j]]], silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               else if(length(level.names) == 6) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt", "Species.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(dt.summary.table.list[[level.names[j]]], file = dataFiles[i], sep = "\t")
+                  write.table(try(dt.summary.table.list[[level.names[j]]], silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               zip(zipfile=DA.file, files=dataFiles)
@@ -2297,7 +2300,7 @@ server = function(input, output, session){
         
         dt_reg_imp_var_list <- list()
         for(name in level.names){
-          dt_reg_imp_var_list[[name]] <- dt.used.var.names(fit, name, colnames.list.reg)
+          dt_reg_imp_var_list[[name]] <- try(dt.used.var.names(fit, name, colnames.list.reg), silent = TRUE)
         }
         output$dt_reg_chatgpt_ui <- renderUI({
           tagList(
@@ -2490,7 +2493,7 @@ server = function(input, output, session){
           nfold <- as.numeric(input$rf_cla_nfold)
           ntree <- as.numeric(input$rf_cla_ntree)
           
-          sam.dat.na <- check.column.class(sam.dat.na)
+          sam.dat.na <- try(check.column.class(sam.dat.na), silent = TRUE)
           sam.dat.na <- try(cov.logistic.reg(sam.dat.na, y.name), silent = TRUE)
           y.name <- "resid"
           
@@ -2613,7 +2616,7 @@ server = function(input, output, session){
               return(NULL)
             })
           })
-          
+         
           output[[paste0("rf_cla_column_table2", j)]] <- renderDataTable({
             tryCatch(rf.pd.var.used(rf.list, level.names[[j]], colnames.list.cla, n = as.numeric(input$rf_cla_var_num), is.cat = is.cat), error = function(e){
               message("Visualization not available! Check the input.")
@@ -2640,11 +2643,12 @@ server = function(input, output, session){
           
           if(input$rf_cla_covariate_yn == "Covariate(s)"){
             output[[paste0("rf_cla_test_error", j)]] <- renderUI({
+              rf_cla_mse <- try(get.mse(predict(rf.list[[level.names[j]]]$fit, rf.list[[level.names[j]]]$test$x), rf.list[[level.names[j]]]$test$y), silent = TRUE)
+              rf_cla_mae <- try(get.mae(predict(rf.list[[level.names[j]]]$fit, rf.list[[level.names[j]]]$test$x), rf.list[[level.names[j]]]$test$y), silent = TRUE)
               tagList(
-                p(strong("Test Results", style = "color:black; font-size:13pt")),
                 tags$ul(
-                  tags$li(p(paste("Test MSE:", try(get.mse(predict(rf.list[[level.names[j]]]$fit, rf.list[[level.names[j]]]$test$x), rf.list[[level.names[j]]]$test$y), silent = TRUE)), style = "font-size:12pt")),
-                  tags$li(p(paste("Test MAE:", try(get.mae(predict(rf.list[[level.names[j]]]$fit, rf.list[[level.names[j]]]$test$x), rf.list[[level.names[j]]]$test$y), silent = TRUE)), style = "font-size:12pt"))
+                  tags$li(p(paste("Test MSE:", try(format(round(rf_cla_mse, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt")),
+                  tags$li(p(paste("Test MAE:", try(format(round(rf_cla_mae, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt"))
                   , style = "font-size:12pt"),
                 p("", style = "margin-bottom: 15pt")
               )
@@ -2652,11 +2656,12 @@ server = function(input, output, session){
           }
           else{
             output[[paste0("rf_cla_test_error", j)]] <- renderUI({
+              rf_cla_err <- try(1-get.acc(predict(rf.list[[level.names[j]]]$fit, rf.list[[level.names[j]]]$test$x), rf.list[[level.names[j]]]$test$y), silent = TRUE)
+              rf_cla_auc <- try(get.auc(predict(rf.list[[level.names[j]]]$fit, rf.list[[level.names[j]]]$test$x, type = "prob")[,2], rf.list[[level.names[j]]]$test$y), silent = TRUE)
               tagList(
-                p(strong("Test Results", style = "color:black; font-size:13pt")),
                 tags$ul(
-                  tags$li(p(paste("Test Misclassification Error:", try(1-get.acc(predict(rf.list[[level.names[j]]]$fit, rf.list[[level.names[j]]]$test$x), rf.list[[level.names[j]]]$test$y), silent = TRUE)), style = "font-size:12pt")),
-                  tags$li(p(paste("Test AUC:", try(get.auc(predict(rf.list[[level.names[j]]]$fit, rf.list[[level.names[j]]]$test$x, type = "prob")[,2], rf.list[[level.names[j]]]$test$y), silent = TRUE)), style = "font-size:12pt"))
+                  tags$li(p(paste("Test Misclassification Error:", try(format(round(rf_cla_err, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt")),
+                  tags$li(p(paste("Test AUC:", try(format(round(rf_cla_auc, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt"))
                   , style = "font-size:12pt"),
                 p("", style = "margin-bottom: 15pt")
               )
@@ -2685,13 +2690,13 @@ server = function(input, output, session){
               if (length(level.names) == 5) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(rf.imp.df(rf.list, level.names[i], type = 0), file = dataFiles[i], sep = "\t")
+                  write.table(try(rf.imp.df(rf.list, level.names[i], type = 0), silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               else if(length(level.names) == 6) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt", "Species.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(rf.imp.df(rf.list, level.names[i], type = 0), file = dataFiles[i], sep = "\t")
+                  write.table(try(rf.imp.df(rf.list, level.names[i], type = 0), silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               zip(zipfile=DA.file, files=dataFiles)
@@ -2709,7 +2714,7 @@ server = function(input, output, session){
         
         rf_cla_imp_var_list <- list()
         for(name in level.names){
-          rf_cla_imp_var_list[[name]] <- rf.imp.df.order(rf.list, name, n = 10, colnames.list.cla, is.cat = is.cat)$names
+          rf_cla_imp_var_list[[name]] <- try(rf.imp.df.order(rf.list, name, n = 10, colnames.list.cla, is.cat = is.cat)$names, silent = TRUE)
         }
         output$rf_cla_chatgpt_ui <- renderUI({
           tagList(
@@ -3025,11 +3030,12 @@ server = function(input, output, session){
           })
           
           output[[paste0("rf_reg_test_error", j)]] <- renderUI({
+            rf_reg_mse <- try(get.mse(predict(rf.list.reg[[level.names[j]]]$fit, rf.list.reg[[level.names[j]]]$test$x), rf.list.reg[[level.names[j]]]$test$y), silent = TRUE)
+            rf_reg_mae <- try(get.mae(predict(rf.list.reg[[level.names[j]]]$fit, rf.list.reg[[level.names[j]]]$test$x), rf.list.reg[[level.names[j]]]$test$y), silent = TRUE)
             tagList(
-              p(strong("Test Results", style = "color:black; font-size:13pt")),
               tags$ul(
-                tags$li(p(paste("Test MSE:", try(get.mse(predict(rf.list.reg[[level.names[j]]]$fit, rf.list.reg[[level.names[j]]]$test$x), rf.list.reg[[level.names[j]]]$test$y), silent = TRUE)), style = "font-size:12pt")),
-                tags$li(p(paste("Test MAE:", try(get.mae(predict(rf.list.reg[[level.names[j]]]$fit, rf.list.reg[[level.names[j]]]$test$x), rf.list.reg[[level.names[j]]]$test$y), silent = TRUE)), style = "font-size:12pt"))
+                tags$li(p(paste("Test MSE:", try(format(round(rf_reg_mse, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt")),
+                tags$li(p(paste("Test MAE:", try(format(round(rf_reg_mae, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt"))
                 , style = "font-size:12pt")
             )
           })
@@ -3056,13 +3062,13 @@ server = function(input, output, session){
               if (length(level.names) == 5) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(rf.imp.df(rf.list.reg, level.names[i], type = 0), file = dataFiles[i], sep = "\t")
+                  write.table(try(rf.imp.df(rf.list.reg, level.names[i], type = 0), silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               else if(length(level.names) == 6) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt", "Species.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(rf.imp.df(rf.list.reg, level.names[i], type = 0), file = dataFiles[i], sep = "\t")
+                  write.table(try(rf.imp.df(rf.list.reg, level.names[i], type = 0), silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               zip(zipfile=DA.file, files=dataFiles)
@@ -3080,7 +3086,7 @@ server = function(input, output, session){
         
         rf_reg_imp_var_list <- list()
         for(name in level.names){
-          rf_reg_imp_var_list[[name]] <- rf.imp.df.order(rf.list.reg, name, n = 10, colnames.list.reg, is.cat = FALSE)$names
+          rf_reg_imp_var_list[[name]] <- try(rf.imp.df.order(rf.list.reg, name, n = 10, colnames.list.reg, is.cat = FALSE)$names, silent = TRUE)
         }
         output$rf_reg_chatgpt_ui <- renderUI({
           tagList(
@@ -3286,7 +3292,7 @@ server = function(input, output, session){
           nfold <- as.numeric(input$xgb_cla_nfold)
           nrounds <- as.numeric(input$xgb_cla_nrounds)
           
-          sam.dat.na <- check.column.class(sam.dat.na)
+          sam.dat.na <- try(check.column.class(sam.dat.na), silent = TRUE)
           sam.dat.na <- try(cov.logistic.reg(sam.dat.na, y.name), silent = TRUE)
           y.name <- "resid"
           
@@ -3350,13 +3356,13 @@ server = function(input, output, session){
         xgb.dep <- list()
         
         for(name in level.names){
-          xgb.loss[[name]] <- try(xgb.error.plot.2(xgb.list, name), silent = FALSE)
-          xgb.shap[[name]] <- try(xgb.shap.summary(xgb.list, n = as.numeric(input$xgb_cla_var_num), rank.name = name), silent = FALSE)
+          xgb.loss[[name]] <- try(xgb.error.plot.2(xgb.list, name), silent = TRUE)
+          xgb.shap[[name]] <- try(xgb.shap.summary(xgb.list, n = as.numeric(input$xgb_cla_var_num), rank.name = name), silent = TRUE)
           if(input$xgb_cla_covariate_yn == "Covariate(s)"){
-            xgb.dep[[name]] <- try(xgb.pdp.reg(xgb.list = xgb.list, rank.name = name, n = as.numeric(input$xgb_cla_var_num), data.type = type), silent = FALSE)
+            xgb.dep[[name]] <- try(xgb.pdp.reg(xgb.list = xgb.list, rank.name = name, n = as.numeric(input$xgb_cla_var_num), data.type = type), silent = TRUE)
           }
           else{
-            xgb.dep[[name]] <- try(xgb.pdp.bin(xgb.list = xgb.list, rank.name = name, n = as.numeric(input$xgb_cla_var_num), data.type = type, cat.name = cat.name), silent = FALSE)
+            xgb.dep[[name]] <- try(xgb.pdp.bin(xgb.list = xgb.list, rank.name = name, n = as.numeric(input$xgb_cla_var_num), data.type = type, cat.name = cat.name), silent = TRUE)
           }
         }
         
@@ -3439,22 +3445,24 @@ server = function(input, output, session){
           
           if(input$xgb_cla_covariate_yn == "Covariate(s)"){
             output[[paste0("xgb_cla_test_error", j)]] <- renderUI({
+              xgb_cla_mse <- try(get.mse(predict(xgb.list[[level.names[j]]]$model, xgb.list[[level.names[j]]]$test), xgb.list[[level.names[j]]]$test.ind$y), silent = TRUE)
+              xgb_cla_mae <- try(get.mae(predict(xgb.list[[level.names[j]]]$model, xgb.list[[level.names[j]]]$test), xgb.list[[level.names[j]]]$test.ind$y), silent = TRUE)
               tagList(
-                p(strong("Test Results", style = "color:black; font-size:13pt")),
                 tags$ul(
-                  tags$li(p(paste("Test MSE:", try(get.mse(predict(xgb.list[[level.names[j]]]$model, xgb.list[[level.names[j]]]$test), xgb.list[[level.names[j]]]$test.ind$y), silent = TRUE)), style = "font-size:12pt")),
-                  tags$li(p(paste("Test MAE:", try(get.mae(predict(xgb.list[[level.names[j]]]$model, xgb.list[[level.names[j]]]$test), xgb.list[[level.names[j]]]$test.ind$y), silent = TRUE)), style = "font-size:12pt"))
+                  tags$li(p(paste("Test MSE:", try(format(round(xgb_cla_mse, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt")),
+                  tags$li(p(paste("Test MAE:", try(format(round(xgb_cla_mae, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt"))
                   , style = "font-size:12pt")
               )
             })
           }
           else{
             output[[paste0("xgb_cla_test_error", j)]] <- renderUI({
+              xgb_cla_err <- try(1-get.acc(as.numeric(predict(xgb.list[[level.names[j]]]$model, xgb.list[[level.names[j]]]$test.ind$x) > 0.5), xgb.list[[level.names[j]]]$test.ind$y), silent = TRUE)
+              xgb_cla_auc <- try(get.auc(predict(xgb.list[[level.names[j]]]$model, xgb.list[[level.names[j]]]$test.ind$x), xgb.list[[level.names[j]]]$test.ind$y), silent = TRUE)
               tagList(
-                p(strong("Test Results", style = "color:black; font-size:13pt")),
                 tags$ul(
-                  tags$li(p(paste("Test Misclassification Error:", try(1-get.acc(as.numeric(predict(xgb.list[[level.names[j]]]$model, xgb.list[[level.names[j]]]$test.ind$x) > 0.5), xgb.list[[level.names[j]]]$test.ind$y), silent = TRUE)), style = "font-size:12pt")),
-                  tags$li(p(paste("Test AUC:", try(get.auc(predict(xgb.list[[level.names[j]]]$model, xgb.list[[level.names[j]]]$test.ind$x), xgb.list[[level.names[j]]]$test.ind$y), silent = TRUE)), style = "font-size:12pt"))
+                  tags$li(p(paste("Test Misclassification Error:", try(format(round(xgb_cla_err, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt")),
+                  tags$li(p(paste("Test AUC:", try(format(round(xgb_cla_auc, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt"))
                   , style = "font-size:12pt"),
                 p("", style = "margin-bottom: 15pt")
               )
@@ -3483,13 +3491,13 @@ server = function(input, output, session){
               if (length(level.names) == 5) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(as.data.frame(xgb.importance[[i]]), file = dataFiles[i], sep = "\t")
+                  write.table(try(as.data.frame(xgb.importance[[i]]), silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               else if(length(level.names) == 6) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt", "Species.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(as.data.frame(xgb.importance[[i]]), file = dataFiles[i], sep = "\t")
+                  write.table(try(as.data.frame(xgb.importance[[i]]), silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               zip(zipfile=DA.file, files=dataFiles)
@@ -3840,11 +3848,12 @@ server = function(input, output, session){
           })
           
           output[[paste0("xgb_reg_test_error", j)]] <- renderUI({
+            xgb_reg_mse <- try(get.mse(predict(xgb.list.reg[[level.names[j]]]$model, xgb.list.reg[[level.names[j]]]$test), xgb.list.reg[[level.names[j]]]$test.ind$y), silent = TRUE)
+            xgb_reg_mae <- try(get.mae(predict(xgb.list.reg[[level.names[j]]]$model, xgb.list.reg[[level.names[j]]]$test), xgb.list.reg[[level.names[j]]]$test.ind$y), silent = TRUE)
             tagList(
-              p(strong("Test Results", style = "color:black; font-size:13pt")),
               tags$ul(
-                tags$li(p(paste("Test MSE:", try(get.mse(predict(xgb.list.reg[[level.names[j]]]$model, xgb.list.reg[[level.names[j]]]$test), xgb.list.reg[[level.names[j]]]$test.ind$y), silent = TRUE)), style = "font-size:12pt")),
-                tags$li(p(paste("Test MAE:", try(get.mae(predict(xgb.list.reg[[level.names[j]]]$model, xgb.list.reg[[level.names[j]]]$test), xgb.list.reg[[level.names[j]]]$test.ind$y), silent = TRUE)), style = "font-size:12pt"))
+                tags$li(p(paste("Test MSE:", try(format(round(xgb_reg_mse, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt")),
+                tags$li(p(paste("Test MAE:", try(format(round(xgb_reg_mae, 4), nsmall = 4), silent = TRUE)), style = "font-size:12pt"))
                 , style = "font-size:12pt")
             )
           })
@@ -3871,13 +3880,13 @@ server = function(input, output, session){
               if (length(level.names) == 5) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(as.data.frame(xgb.importance[[i]]), file = dataFiles[i], sep = "\t")
+                  write.table(try(as.data.frame(xgb.importance[[i]]), silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               else if(length(level.names) == 6) {
                 dataFiles = c("Phylum.txt", "Class.txt", "Order.txt" ,"Family.txt", "Genus.txt", "Species.txt")
                 for(i in 1:length(dataFiles)){
-                  write.table(as.data.frame(xgb.importance[[i]]), file = dataFiles[i], sep = "\t")
+                  write.table(try(as.data.frame(xgb.importance[[i]]), silent = TRUE), file = dataFiles[i], sep = "\t")
                 }
               }
               zip(zipfile=DA.file, files=dataFiles)
